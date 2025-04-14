@@ -33,11 +33,24 @@
                     Total price:
                     £@Order.GetFormattedTotalPrice()
                 </strong>
+                <button class="checkout-button btn btn-warning" @onclick="PlaceOrder" disabled=@isSubmitting>
+                    Place order
+                </button>
             </p>
         </div>
     </div>
 </div>
 
 @code {
+    bool isSubmitting;
     Order Order => OrderState.Order;
+
+    async Task PlaceOrder()
+    {
+        isSubmitting = true;
+        var response = await HttpClient.PostAsJsonAsync(NavigationManager.BaseUri + "orders", OrderState.Order);
+        var newOrderId = await response.Content.ReadFromJsonAsync<int>();
+            OrderState.ResetOrder();
+            NavigationManager.NavigateTo("/");
+    }
 }
